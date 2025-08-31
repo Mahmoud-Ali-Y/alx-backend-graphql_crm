@@ -25,3 +25,4 @@ def log_crm_heartbeat():
             print(f"{message} - GraphQL not responsive")
     except Exception as e:
         print(f"{message} - Error checking GraphQL: {e}")
+    ["from gql.transport.requests import RequestsHTTPTransport", "from gql import", "gql", "Client"]
