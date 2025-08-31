@@ -19,3 +19,4 @@ print(deleted)
 
 # Log result with timestamp
 echo \"$(date '+%Y-%m-%d %H:%M:%S') - Deleted customers: $DELETED_COUNT\" >> /tmp/customer_cleanup_log.txt
+["count"]
