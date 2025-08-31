@@ -2,27 +2,37 @@ import logging
 from datetime import datetime
 import requests
 
-def log_crm_heartbeat():
-    log_file = "/tmp/crm_heartbeat_log.txt"
+def update_low_stock():
+    log_file = "/tmp/low_stock_updates_log.txt"
     timestamp = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
 
-    message = f"{timestamp} CRM is alive"
+    mutation = """
+    mutation {
+        updateLowStockProducts {
+            success
+            updatedProducts {
+                id
+                title
+                stock
+            }
+        }
+    }
+    """
 
-    # Append to log file
-    with open(log_file, "a") as f:
-        f.write(message + "\n")
-
-    # Optional: check GraphQL hello endpoint
     try:
         response = requests.post(
             "http://localhost:8000/graphql",
-            json={"query": "{ hello }"},
-            timeout=5
+            json={"query": mutation},
+            timeout=10
         )
-        if response.status_code == 200:
-            print(f"{message} - GraphQL responded: {response.json()}")
-        else:
-            print(f"{message} - GraphQL not responsive")
+        data = response.json()
+        updates = data.get("data", {}).get("updateLowStockProducts", {})
+
+        with open(log_file, "a") as f:
+            f.write(f"{timestamp} - {updates.get('success')}\n")
+            for product in updates.get("updatedProducts", []):
+                f.write(f"  - {product['title']} new stock: {product['stock']}\n")
+
     except Exception as e:
-        print(f"{message} - Error checking GraphQL: {e}")
-    ["from gql.transport.requests import RequestsHTTPTransport", "from gql import", "gql", "Client"]
+        with open(log_file, "a") as f:
+            f.write(f"{timestamp} - Error: {e}\n")
