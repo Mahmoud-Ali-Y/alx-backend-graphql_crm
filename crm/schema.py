@@ -1,6 +1,7 @@
 import graphene
 from properties.models import Property  # assuming products are in properties app
 from graphene_django.types import DjangoObjectType
+from crm.models import Product
 
 class ProductType(DjangoObjectType):
     class Meta:
